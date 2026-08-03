@@ -313,23 +313,15 @@ the emulator.
 
 ### Exoscale — the `exo` CLI
 
-`exo` has no endpoint flag and no endpoint environment variable. It is redirected
-only through the `endpoint` key of its own configuration file, and that value
-**must carry the `/v2` suffix**: the CLI concatenates it with the route it wants
-rather than adding a version segment. Both facts were found by putting a logging
-proxy between the CLI and the emulator; neither is documented anywhere.
+`exo` can be redirected through environment variable `EXOSCALE_API_ENDPOINT` or
+the `endpoint` key of its own configuration file, and that value **must carry
+the `/v2` suffix**: the CLI concatenates it with the route it wants rather than
+adding a version segment.
 
 ```bash
-cat > /tmp/exoscale.toml <<'EOF'
-defaultaccount = "feint"
-
-[[accounts]]
-name = "feint"
-account = "feint"
-key = "EXOxxxxxxxxxxxxxxxxxxxx"
-secret = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-endpoint = "http://127.0.0.1:4599/v2"
-EOF
+export EXOSCALE_API_ENDPOINT=http://127.0.0.1:4599/v2
+export EXOSCALE_API_KEY=EXOxxxxxxxxxxxxxxxxxxxx
+export EXOSCALE_API_SECRET=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 exo -C /tmp/exoscale.toml compute instance-template list
 exo -C /tmp/exoscale.toml compute instance create demo \
