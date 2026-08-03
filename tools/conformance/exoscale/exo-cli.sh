@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 # Conformance check: drive the emulator with the real Exoscale CLI.
 #
-# `exo` has endpoint environment variable EXOSCALE_API_ENDPOINT, and that value
-# must carry the /v2 suffix: the CLI concatenates it with the route it wants
-# rather than adding a version segment of its own. Both facts were measured by
-# putting a logging proxy between the CLI and the emulator, because neither is
-# documented.
+# `exo` is redirected through EXOSCALE_API_ENDPOINT, and that value must carry
+# the /v2 suffix: the CLI concatenates it with the route it wants rather than
+# adding a version segment of its own. Both facts were measured, the suffix by
+# putting a logging proxy between the CLI and the emulator, the variable by
+# pointing it at a dead port and reading the error name that port.
+#
+# It replaces a generated configuration file, which this suite wrote for as long
+# as the variable was believed not to exist. `exo -C` refuses a file that is not
+# there, so nothing here may pass -C any more.
 #
 # The order the CLI works in was measured the same way, and it is why this suite
 # exists at all. `exo compute instance create` issues, before it posts anything:
@@ -42,7 +46,7 @@ export EXOSCALE_API_ENDPOINT=${ENDPOINT}/v2
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
 ok() { echo "  ok: $*"; }
-exoc() { exo -C "$WORK/exoscale.toml" "$@"; }
+exoc() { exo "$@"; }
 
 echo "conformance: exo CLI against $ENDPOINT"
 
