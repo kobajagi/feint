@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 # Conformance check: drive the emulator with the real Exoscale CLI.
 #
-# `exo` has no --endpoint flag and no endpoint environment variable. It is
-# redirected through the `endpoint` key of its own configuration file, and that
-# value must carry the /v2 suffix: the CLI concatenates it with the route it
-# wants rather than adding a version segment of its own. Both facts were measured
-# by putting a logging proxy between the CLI and the emulator, because neither is
+# `exo` has endpoint environment variable EXOSCALE_API_ENDPOINT, and that value
+# must carry the /v2 suffix: the CLI concatenates it with the route it wants
+# rather than adding a version segment of its own. Both facts were measured by
+# putting a logging proxy between the CLI and the emulator, because neither is
 # documented.
 #
 # The order the CLI works in was measured the same way, and it is why this suite
@@ -39,16 +38,7 @@ set +a
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-cat > "$WORK/exoscale.toml" <<EOF
-defaultaccount = "feint"
-
-[[accounts]]
-name = "feint"
-account = "feint"
-key = "$EXOSCALE_API_KEY"
-secret = "$EXOSCALE_API_SECRET"
-endpoint = "$ENDPOINT/v2"
-EOF
+export EXOSCALE_API_ENDPOINT=${ENDPOINT}/v2
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
 ok() { echo "  ok: $*"; }
